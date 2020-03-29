@@ -1,0 +1,48 @@
+<!-- 
+    // 店铺经营名称
+        // 商户号
+        // 店铺号
+        // 所属一级
+        // 所属二级
+        // 店铺地址
+        // 店铺联系方式
+        // 区域负责人
+        /*
+        "name": "门店名称",
+        "merchno": "店铺编号",
+        "bankId": "银行编号",
+        "areaId": "归属区域id",
+        "areaName": "归属区域",
+        // "subCompany": "所属分公司",
+        "firstSubBank": "一级分行",
+        "secondSubBank": "二级分行",
+        "orgaddress": "地址",
+        "telno": "电话"
+-->
+<html>
+    <head>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <form action="#">
+        <span>门店名称:</span><input id="name"></input><br>
+        <span>门店编号:</span><input id="merchno"></input><br>
+        <span>银行编号:</span><input id="bankId"></input><br>
+        <span>归属区id:</span><input id="areaId"></input><br>
+        <span>归属区区域名称:</span><input id="areaName"></input><br>
+        <span>一级分行:</span><input id="firstSubBank"></input><br>
+        <span>二级分行:</span><input id="secondSubBank"></input><br>
+        <span>地址:</span><input id="orgaddress"></input><br>
+        <div id="s2id_subCompany">
+        <span>公司:</span><select id="subCompany">
+            <option value="1">北京分公司</option>
+            <option value="2">广州分公司</option>
+            <option value="3">上海分公司</option>
+        </select>
+        <input type="text" class="select2-chosen">
+        </div>
+        <span>电话:</span><input id="telno"></input><br>
+        <input type="submit" id="btnSubmit"/>
+        </form>
+    </body>
+</html>

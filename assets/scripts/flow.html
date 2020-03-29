@@ -1,0 +1,41 @@
+<style>
+    .select {
+        background-color:black;
+        color:yellow;
+    }
+    .time{
+        width:130px;
+    }
+    #savecur {
+        visibility: hidden;
+    }
+</style>
+<input id = "xlsFile" type="file" />
+<select id="selectSheet">
+</select>
+管辖区域经理:<select id="manager">
+    <option>张三</option>
+    <option>王五</option>
+    <option>赵六</option>
+    <option>二狗子</option>
+    <option>大傻子</option>
+</select>
+<p style="vertical-align: middle;">
+导出时间:<input type = "date" id="btime" value="" class="time"/>  - <input type = "date" id="etime" value="" class="time"/>
+<button id="savetosql">数据导出</button><button id="statisticBtn">统计</button><button id="savecur">保存当前</button>
+</p>
+<table id="statistic" border="1">
+
+</table>
+
+<table id="targetSelect" border="1" >
+
+</table>
+<div style="overflow-y: scroll; height:400px">
+    <table id='xlsdata' border="1" style="overflow:scroll;" >
+    </table>
+</div>
+<div id="result"></div>
+<script>
+    
+</script>

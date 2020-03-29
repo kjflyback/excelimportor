@@ -1,0 +1,29 @@
+{
+
+  "name": "ExcelImportor",
+  "version": "0.0.2",
+  "manifest_version": 2,
+  "description": "excel 数据填入web表单",
+  "web_accessible_resources": [
+    "assets/scripts/flow.html"
+  ],
+  "background": {
+    "scripts": ["assets/scripts/background.js"],
+    "persistent": true
+  },
+  "content_scripts": [{
+    "matches": ["file:///*/testframe.html"],
+    "js": [
+      "assets/libs/jQuery/jquery.js",
+      "assets/libs/xlsx.core.min.js",
+      "assets/scripts/flow.js",
+      "assets/scripts/page.js"
+    ],
+    "all_frames":true,
+    "run_at":"document_end"
+  }],
+  "permissions": [
+        "tabs", 
+         "file:///*"
+       ]
+}
