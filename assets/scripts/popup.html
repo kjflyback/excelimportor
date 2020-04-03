@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <style>
+        body{
+            width:500px;
+        }
+    </style>
+    
+</head>
+
+<body>
+    <h1>批量数据填表助手</h1> 
+    <table><tr><td>获取excel文件数据</td><td><input type="file" id="xlsFile"></input></td></tr>
+        <tr><td>当前数据源(内存)</td><td><div id="currentFile"></div></td></tr>
+        <tr><td>选择Sheet</td><td><select id="sheetnames"></select><button id="preview">预览</button></td></tr>
+    </table>
+    <h2>目标页面:</h2>
+    <div id="target"></div><br>
+    <button id = "refresh">重新获取对应关系</button>
+    <button id="prev">上一条</button><button id="next">下一条</button>
+    <table id="namelist">
+        <thead>
+            <tr><td>目标名称(鼠标滑过可在目标页面定位)</td><td>对应Excel列</td><td>当前值</td></tr>
+        </thead>
+    </table>
+    <h1>1. 点击获取excel文件数据按钮<br>
+        2. 选择对应Sheet名称<br>
+        3. 选择对应目标页面(通常填表的表单是在顶层页面的一个子frame里面)<br>
+        4. 点击重新获取对应关系<br>
+        5. 根据控件名称选择对应的Excel列<br>
+    </h1>
+
+</body>
+<script src="../libs/jQuery/jquery.js"></script>
+<script src="popup.js"></script>
+</html>
