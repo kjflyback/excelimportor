@@ -1,7 +1,7 @@
 {
 
   "name": "ExcelImportor",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "manifest_version": 2,
   "description": "excel 数据填入web表单",
   "browser_action":{
