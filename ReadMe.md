@@ -1,5 +1,8 @@
 # Chrome扩展读取excel文件内容填入web表单
 
+-----
+直接下载excelimportor.crx文件，然后修改后缀为.zip,解压后用Chrome的调试模式加载
+
 
 ------
 - 更新
