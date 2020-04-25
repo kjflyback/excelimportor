@@ -1,7 +1,7 @@
 {
 
   "name": "ExcelImportor",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "manifest_version": 2,
   "description": "excel 数据填入web表单",
   "browser_action":{
@@ -19,13 +19,10 @@
     "matches": ["<all_urls>"],
     "js": [
       "assets/libs/jQuery/jquery.js",
-      "assets/libs/xlsx.core.min.js",
       "assets/scripts/inject.js"
     ],
     "all_frames":true,
-    "run_at":"document_end",
-    
-    "match_about_blank":true
+    "run_at":"document_end"
   }],
   "permissions": [
         "tabs", 
