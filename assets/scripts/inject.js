@@ -62,15 +62,20 @@ var client = {
 		service.reporthref();
 	},
 	active: function(rq, sender) {
-		// console.log(rq);
+		console.log(rq);
 		if (this.isactived) return;
 		this.isactived = true;
+		
 		activeOperation();
 		
 	}
 }
 
 function checkIsNeedShowWindow(){
+	// 已经存在窗口则不继续检查
+	if($("#flow").length) return;
+	setTimeout("checkIsNeedShowWindow()", 1000);
+	
 	service.querydata(function(data){
 		// console.log(data);
 		var isNeed = false;
@@ -214,6 +219,9 @@ function activeOperation() {
 		
 		// 绑定数据
 		$("#datamenu").remove();
+		if(e.target.id == "highlightControl") return;
+		
+		$("#highlightControl").remove();
 		// console.log(document.activeElement.tagName);
 		// 除了body之外的都是操作对象
 		if (document.activeElement.tagName == "BODY"  ) {
@@ -281,5 +289,7 @@ chrome.runtime.onMessage.addListener(
 
 loadPattern();
 // console.log(service.match)
-checkIsNeedShowWindow();
+
 fillData();
+
+checkIsNeedShowWindow();
