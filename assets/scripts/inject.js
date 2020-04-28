@@ -1,6 +1,7 @@
 var server = {
 	extid: "",
 	send: function(obj, response) {
+		// console.log(obj);
 		chrome.runtime.sendMessage( obj, function(rp) {
 			if (response) response(rp);
 		});
@@ -62,7 +63,7 @@ var client = {
 		service.reporthref();
 	},
 	active: function(rq, sender) {
-		console.log(rq);
+		// console.log(rq);
 		if (this.isactived) return;
 		this.isactived = true;
 		
@@ -129,8 +130,10 @@ function fillData(){
 			var index = data.match[k];
 			// console.log(index)
 			var val = data.data[index];
+			var xpathString = window.atob(k)
 			var obj = // $("[name='" + k + "']")[0];
-				xpath2objlist(window.atob(k))[0];
+				xpath2objlist(xpathString)[0];
+			// console.log(obj)
 			if(obj == undefined) continue
 			// console.log()
 			if(obj.type == "select-one"){
@@ -199,15 +202,15 @@ function setMenuData(e, data, match){
 		var index = $(this).attr("colid");
 		service.binding(index, objFor);
 		var storage = window.localStorage;
-		storage.setItem(objFor, index);
+		storage.setItem("excelimportor_" + objFor, index);
 	});
 }
 function showXlsData(e) {
-	console.log('showxls');
+	// console.log('showxls');
 	// var forObjName = $(e.srcElement).attr("for");
 	
 	service.querydata(function(data) {
-		console.log(data)
+		// console.log(data)
 		setMenuData(e, data.data, data.match);		
 	})
 	
@@ -282,13 +285,18 @@ function loadPattern(){
 		// find obj
 		// console.log(key);
 		if(!key.length) continue;
-		var xpathString = window.atob(key);
+		// "excelimportor_" + 
+		if(key.indexOf("excelimportor_") == -1) continue;
+		var encodeKey = key.substring("excelimportor_".length);
+		
+		var xpathString = window.atob(encodeKey);
+		// console.log(xpathString);
 		var objlst = xpath2objlist(xpathString);
 		
 		if(objlst.length){
 			var val = storage.getItem(key);
-			service.match[key] = val;
-			service.binding(val, key);
+			service.match[encodeKey] = val;
+			service.binding(val, encodeKey);
 		}
 	}
 }
