@@ -82,7 +82,8 @@ function checkIsNeedShowWindow(){
 		for(var k in data.match){
 			// 检查是否存在特定的控件名称
 			// console.log(k);
-			var obj = $("[name='" + k + "']");
+			var obj = // $("[name='" + k + "']")[0];
+				xpath2objlist(window.atob(k));
 			// console.log(obj)
 			if(obj.length){
 				isNeed = true;
@@ -128,7 +129,8 @@ function fillData(){
 			var index = data.match[k];
 			// console.log(index)
 			var val = data.data[index];
-			var obj = $("[name='" + k + "']")[0];
+			var obj = // $("[name='" + k + "']")[0];
+				xpath2objlist(window.atob(k))[0];
 			if(obj == undefined) continue
 			// console.log()
 			if(obj.type == "select-one"){
@@ -218,10 +220,14 @@ function activeOperation() {
 		if($(e.target).parents("#datamenu").length > 0) return;
 		
 		// 绑定数据
-		$("#datamenu").remove();
+		if($("#datamenu").length)
+				$("#datamenu").remove();
+				
 		if(e.target.id == "highlightControl") return;
 		
-		$("#highlightControl").remove();
+		if($("#highlightControl").length){
+			$("#highlightControl").remove();
+		}
 		// console.log(document.activeElement.tagName);
 		// 除了body之外的都是操作对象
 		if (document.activeElement.tagName == "BODY"  ) {
@@ -233,9 +239,9 @@ function activeOperation() {
 		if (document.activeElement.type == "button") return;
 		if (document.activeElement.tagName == "button") return;
 		var obj = document.activeElement;
-		var objName = obj.name;
+		var objName = readXPath(obj);
 		
-		if(!$('[for="' + objName + '"]')) return;
+		if(!$('[for="' + window.btoa(objName) + '"]')) return;
 		
 		// 显示操作窗口
 		var pos = {
@@ -246,7 +252,7 @@ function activeOperation() {
 		var cover =
 			"<div style='position:absolute; background-color:red;color:yellow;valign:middle;text-align:center;border-radius: 3px;" +
 			"width:16" + /*obj.offsetWidth + */ "px;" + "height: " + (obj.offsetHeight - 4) + "px;" +
-			"' id='highlightControl' for='" + objName + "' title='点击进行配置'></div>";
+			"' id='highlightControl' for='" + window.btoa(objName) + "' title='点击进行配置'></div>";
 		// console.log(cover);
 		cover = $(cover);
 		cover.text('>');
@@ -258,6 +264,7 @@ function activeOperation() {
 			left: pos.left
 		});
 		
+		// console.log(readXPath(obj));
 		cover.click(function(e) {
 			e = e || window.event;
 			showXlsData(e);
@@ -272,7 +279,13 @@ function loadPattern(){
 	var storage = window.localStorage;
 	for(var i = 0;i<storage.length;i++){
 		var key = storage.key(i)
-		if($("[name='" + key +"']")){
+		// find obj
+		// console.log(key);
+		if(!key.length) continue;
+		var xpathString = window.atob(key);
+		var objlst = xpath2objlist(xpathString);
+		
+		if(objlst.length){
 			var val = storage.getItem(key);
 			service.match[key] = val;
 			service.binding(val, key);
@@ -286,6 +299,43 @@ chrome.runtime.onMessage.addListener(
 		sendResponse();
 	}
 );
+
+
+//获取xpath
+function readXPath(element) {
+	// console.log(element);
+    if (element.id !== "" && element.id != undefined) {//判断id属性，如果这个元素有id，则显 示//*[@id="xPath"]  形式内容
+        return '//*[@id=\"' + element.id + '\"]';
+    }
+    //这里需要需要主要字符串转译问题，可参考js 动态生成html时字符串和变量转译（注意引号的作用）
+    if (element == document.body) {//递归到body处，结束递归
+        return '/html/' + element.tagName.toLowerCase();
+    }
+    var ix = 1,//在nodelist中的位置，且每次点击初始化
+         siblings = element.parentNode.childNodes;//同级的子元素
+ 
+    for (var i = 0, l = siblings.length; i < l; i++) {
+        var sibling = siblings[i];
+        //如果这个元素是siblings数组中的元素，则执行递归操作
+        if (sibling == element) {
+            return arguments.callee(element.parentNode) + '/' + element.tagName.toLowerCase() + '[' + (ix) + ']';
+            //如果不符合，判断是否是element元素，并且是否是相同元素，如果是相同的就开始累加
+        } else if (sibling.nodeType == 1 && sibling.tagName == element.tagName) {
+            ix++;
+        }
+    }
+};
+
+function xpath2objlist(STR_XPATH) {
+    var xresult = document.evaluate(STR_XPATH, document, null, XPathResult.ANY_TYPE, null);
+    var xnodes = [];
+    var xres;
+    while (xres = xresult.iterateNext()) {
+        xnodes.push(xres);
+    }
+
+    return xnodes;
+}
 
 loadPattern();
 // console.log(service.match)
