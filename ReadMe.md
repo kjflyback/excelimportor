@@ -16,6 +16,10 @@
 
 [github源代码](https://github.com/kjflyback/excelimportor/tree/master)
 
+V0.0.5
+修改了操作方式
+
+
 ## 代码解析及原理
 
 manifest.json 文件
