@@ -159,7 +159,20 @@ function setMenuData(e, data, match){
 	// console.log(e);
 	var objFor = $(e.target).attr('for');
 	// console.log(objFor);
-	
+	var msgForRadio = []
+	var targetObject = xpath2objlist(window.atob(objFor))[0];
+	if(targetObject.type == 'radio'){
+		var nameOfRadio = targetObject.name;
+		document.querySelectorAll("[type='radio'][name='" + nameOfRadio + "']").forEach(
+			function(obj){
+				msgForRadio.push(obj.value)
+			}
+		)
+	}
+	var radioMsg = "";
+	if(msgForRadio.length){
+		radioMsg = "<strong>单选按钮的取值为:" + msgForRadio.join(",") + "其中之一,请在excel中填入这些值</strong><br>";
+	}
 	var showtable = $("<table style='border-collapse: collapse;'></table>");
 	var ch = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	var columnName = ch.split('');
@@ -177,6 +190,7 @@ function setMenuData(e, data, match){
 	}
 	var recordBtn = $("<button id='prev'>上一条</button><button id='next'>下一条</button>");
 	var flowDiv = $("<div style='position:absolute;background:gainsboro;border:solid 1px darkgrey;width:300px;height:auto;'></div>")
+	.append(radioMsg)
 	.append(recordBtn)
 	.append(showtable);
 	
