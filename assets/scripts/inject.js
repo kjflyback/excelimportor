@@ -135,8 +135,19 @@ function fillData(){
 				xpath2objlist(xpathString)[0];
 			// console.log(obj)
 			if(obj == undefined) continue
-			// console.log()
-			if(obj.type == "select-one"){
+			// console.log(obj)
+			if(obj.type == 'radio'){
+				// 不能改变它的value，而是从同名的radio中打check
+				// 查找同name的val
+				var nameOfE = obj.name;
+				var tags = document.querySelectorAll("[name='" + nameOfE + "']");
+				tags.forEach(function(inobj){
+					console.log(inobj.value); 
+					if(inobj.value == val) 
+					inobj.checked = true;
+					})
+					continue;
+			}else if(obj.type == "select-one"){
 				val = $(obj).find("option:contains('" + val + "')").val() || val;
 				// console.log(val);
 			}
