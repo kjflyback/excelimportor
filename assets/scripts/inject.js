@@ -150,6 +150,13 @@ function fillData(){
 			}else if(obj.type == "select-one"){
 				val = $(obj).find("option:contains('" + val + "')").val() || val;
 				// console.log(val);
+			}else if(obj.type == "checkbox"){ // 对checkbox加入识别, 可判读 1/是/有			
+				if(val && (val == 1) || (val == "1") || (val == "是") || (val == "有")){
+					obj.checked = true;
+				}else{
+					obj.checked = false;
+				}
+				continue;
 			}
 			$(obj).val(val);
 		}
@@ -182,7 +189,7 @@ function setMenuData(e, data, match){
 		
 		var radio = "<input type='radio' name='datatarget' colid='" + k + "' for='" + objFor + "' " + (k == index?"checked":"")+ "></input>";
 		$(showtable).append($("<tr><td style='border:1px solid black;'>" 
-		+ columnName[k] 
+		+ (columnName[k] || (k + '列'))
 		+ "</td><td  style='border:1px solid black;'>" 
 		+ radio + "</td><td style='border:1px solid black;' columnid='" 
 		+ k + "'>"
@@ -196,7 +203,7 @@ function setMenuData(e, data, match){
 	
 	e = e || window.event;
 	flowDiv.css("left", e.clientX);
-	flowDiv.css("top", e.clientY);
+	flowDiv.css("top", 0);
 	flowDiv.attr("id", "datamenu");
 	$("body").append(flowDiv);
 	
