@@ -10,22 +10,22 @@
 -----
 
 
-[不愿意用github的懒人看这里，收点税](https://download.csdn.net/download/flyback/12316927)
+[不愿意用github的懒人看这里，收点税 V0.0.5](https://download.csdn.net/download/flyback/12316927)
 
 [操作说明](https://jingyan.baidu.com/article/b7001fe14ed9bf4f7382dd33.html)
 
-[github源代码](https://github.com/kjflyback/excelimportor/tree/master)
+[github源代码](https://github.com/kjflyback/excelimportor/tree/kjflyback-nomovie)
 
 V0.0.7
- - [ ] 加入对checkbox控件的支持
- - [ ] 修改数据匹配窗口显示方式为紧贴网页的顶部
- - [ ] 修改数据匹配窗口的对应列当超过Z时显示为n列
+- [X] 加入对checkbox控件的支持
+- [X] 修改数据匹配窗口显示方式为紧贴网页的顶部
+- [X] 修改数据匹配窗口的对应列当超过Z时显示为n列
  
 V0.0.6
-加入对radio控件的支持
+- [X] 加入对radio控件的支持
 
 V0.0.5
-修改了操作方式
+- [X] 修改了操作方式
 
 
 
