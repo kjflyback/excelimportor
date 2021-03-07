@@ -36,6 +36,12 @@ var service = {
 			cmd:'next'
 		}, done);
 	},
+	toitem:function(index, done){
+			server.send({
+				cmd:'toitem',
+				index:index
+			}, done)
+	},
 	binding:function(index,objName){
 		// save to localstorage
 		
@@ -53,6 +59,13 @@ var service = {
 			cmd:'getIndex',
 			objName:objName
 		},done)
+	},
+	locate:function(leftorright){
+		server.send({
+			cmd:'locate', locate:leftorright
+		},function(){
+			
+		})
 	}
 }
 
@@ -93,18 +106,43 @@ function checkIsNeedShowWindow(){
 		}
 		if(!isNeed) return;
 		
-		addFlowControl(data.row);
+		addFlowControl(data.row, data.locate);
 	});
 }
 
-function addFlowControl(row){
-
+function addFlowControl(row, locate){
+		alert(locate)
         var div = document.createElement("div");
         div.id = "flow";
-        div.innerHTML = "批量数据填表助手 行号:<span id='agency_row'></span><br><button id='agency_prev'>上一条</button><button id='agency_next'>下一条</button>";
-        div.style = "box-shadow: 2px 2px 5px #888888;color:white;padding:10px;valign:middle;border-radius: 6px;position:fixed;bottom: 1rem;left: 1rem;z-index: 9999;background-color: darkblue;"
+        div.innerHTML = 
+"<button id='left-align'>&lt;</button> <button id='right-align'>&gt;</button>\n\
+批量数据填表助手 行号:<span id='agency_row'> \
+</span><br><button id='agency_prev'>上一条</button>\
+<button id='agency_next'>下一条</button>\n第<input type='text' id='skipitem' size='3' value='1'>条";
+        div.style = "box-shadow: 2px 2px 5px #888888;color:white;padding:10px;valign:middle;border-radius: 6px;position:fixed;bottom: 1rem;z-index: 9999;background-color: darkblue;"
         document.body.appendChild(div);
+		if((locate == 'left') || (locate == 'right')){
+			$("#flow").css(locate, "1rem");
+		}
 		
+		$("#left-align").click(function(){
+			$("#flow").css("left", "1rem");
+			$("#flow").css("right", "");
+			service.locate("left")
+		})
+		$("#right-align").click(function(){
+			$("#flow").css("left", "");
+			$("#flow").css("right", "1rem");
+			service.locate("right")
+		})
+		$("#skipitem").keydown(function(event){
+			if(event.keyCode ==13){
+				// alert($("#skipitem")[0].value)
+				service.toitem($("#skipitem")[0].value, function(){
+					fillData()
+				});
+			}
+		})
 		$("#agency_row").text(row);
 
         $("#agency_prev").click(function () {            
