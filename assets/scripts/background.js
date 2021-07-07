@@ -57,7 +57,8 @@ var server = {
 	sheet: undefined,
 	filename: undefined,
 	row: 0,
-	match:{}
+	match: {},
+	locate:'left'
 };
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
@@ -107,8 +108,8 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 
 chrome.runtime.onMessage.addListener(function(rq, send, response) {
 	if (server.lock) {
-		if(send.tab.id != server.targetid) return;
-		}
+		if (send.tab.id != server.targetid) return;
+	}
 	if (rq.cmd == "reporthref" && server.ucallback) {
 		// console.log(server);
 		if (!server.lock) {
@@ -130,34 +131,59 @@ chrome.runtime.onMessage.addListener(function(rq, send, response) {
 		var worksheet = server.workbook.Sheets[server.sheet];
 		var samples = XLSX.utils.sheet_to_csv(worksheet)
 		var xlsdata = csv2array(samples, server.row);
-		
-		response({match:server.match, data:xlsdata, row:server.row});
+
+		response({
+			match: server.match,
+			data: xlsdata,
+			row: server.row,
+			locate: server.locate
+		});
 		return;
 	}
-	if(rq.cmd == "prev"){
-		server.row -= server.row > 0?1:0;
+	if (rq.cmd == "prev") {
+		server.row -= server.row > 0 ? 1 : 0;
 		response();
 		return;
 	}
-	if(rq.cmd == "next"){
+	if (rq.cmd == "next") {
 		var sheet = server.workbook.Sheets[server.sheet];
 		var range = XLSX.utils.decode_range(sheet['!ref']);
-		if(range)
-				server.row += range.e.r > server.row?1:0;
+		if (range)
+			server.row += range.e.r > server.row ? 1 : 0;
 		response();
 		return;
 	}
-	if(rq.cmd == "binding"){
+	if (rq.cmd == "binding") {
 		server.match[rq.objName] = rq.index;
 	}
-
+	if (rq.cmd == 'toitem') {
+		var sheet = server.workbook.Sheets[server.sheet];
+		var range = XLSX.utils.decode_range(sheet['!ref']);
+		if (range) {
+			// server.row += range.e.r > server.row?1:0;
+			if (range.e.r > rq.index) {
+				server.row = parseInt(rq.index)
+			} else {
+				server.row = parseInt(range.e.r)
+			}
+			response();
+		}
+		
+		return;
+	}
+	if(rq.cmd == "locate"){
+		// save locate left or right
+		server.locate = rq.locate
+	}
+	response();
+	return;
 });
 
 function csv2array(data, rowIndex) {
 	// 将csv转换成表格
 	var rows = data.split('\n');
 	rows.pop(); // 最后一行没用的
-	var columns = rows[rowIndex].split(',');
+	var columns = (rows[rowIndex] || "").split(',');
 	return columns;
 }
 // 读取本地excel文件
@@ -184,4 +210,3 @@ function getSheetNames() {
 function selectSheet(nameOfSheet) {
 	server.sheet = nameOfSheet;
 }
-

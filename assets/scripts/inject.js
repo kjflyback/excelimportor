@@ -36,6 +36,12 @@ var service = {
 			cmd:'next'
 		}, done);
 	},
+	toitem:function(index, done){
+			server.send({
+				cmd:'toitem',
+				index:index
+			}, done)
+	},
 	binding:function(index,objName){
 		// save to localstorage
 		
@@ -53,6 +59,13 @@ var service = {
 			cmd:'getIndex',
 			objName:objName
 		},done)
+	},
+	locate:function(leftorright){
+		server.send({
+			cmd:'locate', locate:leftorright
+		},function(){
+			
+		})
 	}
 }
 
@@ -93,18 +106,43 @@ function checkIsNeedShowWindow(){
 		}
 		if(!isNeed) return;
 		
-		addFlowControl(data.row);
+		addFlowControl(data.row, data.locate);
 	});
 }
 
-function addFlowControl(row){
-
+function addFlowControl(row, locate){
+		alert(locate)
         var div = document.createElement("div");
         div.id = "flow";
-        div.innerHTML = "批量数据填表助手 行号:<span id='agency_row'></span><br><button id='agency_prev'>上一条</button><button id='agency_next'>下一条</button>";
-        div.style = "box-shadow: 2px 2px 5px #888888;color:white;padding:10px;valign:middle;border-radius: 6px;position:fixed;bottom: 1rem;left: 1rem;z-index: 9999;background-color: darkblue;"
+        div.innerHTML = 
+"<button id='left-align'>&lt;</button> <button id='right-align'>&gt;</button>\n\
+批量数据填表助手 行号:<span id='agency_row'> \
+</span><br><button id='agency_prev'>上一条</button>\
+<button id='agency_next'>下一条</button>\n第<input type='text' id='skipitem' size='3' value='1'>条";
+        div.style = "box-shadow: 2px 2px 5px #888888;color:white;padding:10px;valign:middle;border-radius: 6px;position:fixed;bottom: 1rem;z-index: 9999;background-color: darkblue;"
         document.body.appendChild(div);
+		if((locate == 'left') || (locate == 'right')){
+			$("#flow").css(locate, "1rem");
+		}
 		
+		$("#left-align").click(function(){
+			$("#flow").css("left", "1rem");
+			$("#flow").css("right", "");
+			service.locate("left")
+		})
+		$("#right-align").click(function(){
+			$("#flow").css("left", "");
+			$("#flow").css("right", "1rem");
+			service.locate("right")
+		})
+		$("#skipitem").keydown(function(event){
+			if(event.keyCode ==13){
+				// alert($("#skipitem")[0].value)
+				service.toitem($("#skipitem")[0].value, function(){
+					fillData()
+				});
+			}
+		})
 		$("#agency_row").text(row);
 
         $("#agency_prev").click(function () {            
@@ -135,10 +173,28 @@ function fillData(){
 				xpath2objlist(xpathString)[0];
 			// console.log(obj)
 			if(obj == undefined) continue
-			// console.log()
-			if(obj.type == "select-one"){
+			// console.log(obj)
+			if(obj.type == 'radio'){
+				// 不能改变它的value，而是从同名的radio中打check
+				// 查找同name的val
+				var nameOfE = obj.name;
+				var tags = document.querySelectorAll("[name='" + nameOfE + "']");
+				tags.forEach(function(inobj){
+					console.log(inobj.value); 
+					if(inobj.value == val) 
+					inobj.checked = true;
+					})
+					continue;
+			}else if(obj.type == "select-one"){
 				val = $(obj).find("option:contains('" + val + "')").val() || val;
 				// console.log(val);
+			}else if(obj.type == "checkbox"){ // 对checkbox加入识别, 可判读 1/是/有			
+				if(val && (val == 1) || (val == "1") || (val == "是") || (val == "有")){
+					obj.checked = true;
+				}else{
+					obj.checked = false;
+				}
+				continue;
 			}
 			$(obj).val(val);
 		}
@@ -148,7 +204,20 @@ function setMenuData(e, data, match){
 	// console.log(e);
 	var objFor = $(e.target).attr('for');
 	// console.log(objFor);
-	
+	var msgForRadio = []
+	var targetObject = xpath2objlist(window.atob(objFor))[0];
+	if(targetObject.type == 'radio'){
+		var nameOfRadio = targetObject.name;
+		document.querySelectorAll("[type='radio'][name='" + nameOfRadio + "']").forEach(
+			function(obj){
+				msgForRadio.push(obj.value)
+			}
+		)
+	}
+	var radioMsg = "";
+	if(msgForRadio.length){
+		radioMsg = "<strong>单选按钮的取值为:" + msgForRadio.join(",") + "其中之一,请在excel中填入这些值</strong><br>";
+	}
 	var showtable = $("<table style='border-collapse: collapse;'></table>");
 	var ch = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	var columnName = ch.split('');
@@ -158,7 +227,7 @@ function setMenuData(e, data, match){
 		
 		var radio = "<input type='radio' name='datatarget' colid='" + k + "' for='" + objFor + "' " + (k == index?"checked":"")+ "></input>";
 		$(showtable).append($("<tr><td style='border:1px solid black;'>" 
-		+ columnName[k] 
+		+ (columnName[k] || (k + '列'))
 		+ "</td><td  style='border:1px solid black;'>" 
 		+ radio + "</td><td style='border:1px solid black;' columnid='" 
 		+ k + "'>"
@@ -166,12 +235,13 @@ function setMenuData(e, data, match){
 	}
 	var recordBtn = $("<button id='prev'>上一条</button><button id='next'>下一条</button>");
 	var flowDiv = $("<div style='position:absolute;background:gainsboro;border:solid 1px darkgrey;width:300px;height:auto;'></div>")
+	.append(radioMsg)
 	.append(recordBtn)
 	.append(showtable);
 	
 	e = e || window.event;
 	flowDiv.css("left", e.clientX);
-	flowDiv.css("top", e.clientY);
+	flowDiv.css("top", 0);
 	flowDiv.attr("id", "datamenu");
 	$("body").append(flowDiv);
 	
