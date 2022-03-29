@@ -233,7 +233,7 @@ function setMenuData(e, data, match){
 		+ k + "'>"
 		+ data[k] + "</td></tr>"));
 	}
-	var recordBtn = $("<button id='prev'>上一条</button><button id='next'>下一条</button>");
+	var recordBtn = $("<button id='prev'>上一条</button><button id='next'>下一条</button><button id='load'>载入存档</button>");
 	var flowDiv = $("<div style='position:absolute;background:gainsboro;border:solid 1px darkgrey;width:300px;height:auto;'></div>")
 	.append(radioMsg)
 	.append(recordBtn)
@@ -262,6 +262,10 @@ function setMenuData(e, data, match){
 				}
 			})
 		})
+	});
+	$("#load").click(function(e){		
+		loadPattern()
+		console.log("载入之前存档")
 	});
 	$("input[type='radio'][name='datatarget']").click(function(e){
 		if(!$(this).is(":checked")){
