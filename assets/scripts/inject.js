@@ -199,8 +199,12 @@ function fillData(){
 			// 为了避免直接通过js设置input的value时无法出发键盘事件导致无法提交，需要触发一次键盘事件
 			let evt = document.createEvent('HTMLEvents');
 			evt.initEvent('input', true, true);
+			//尝试加入 鼠标选择事件，暂时因为选不中所需要的控件，失败
+			let evt_click = document.createEvent('HTMLEvents');
+			evt_click.initEvent('click', true, true);
 			$(obj).val(val);
 			obj.dispatchEvent(evt)
+			//obj.dispatchEvent(evt_click)
 		}
 	})
 }
