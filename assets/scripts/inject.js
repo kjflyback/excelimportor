@@ -319,7 +319,9 @@ function activeOperation() {
 		// 显示操作窗口
 		var pos = {
 			top: $(obj).offset().top + 2,
-			left: $(obj).offset().left + obj.offsetWidth + 3
+			//left: $(obj).offset().left + obj.offsetWidth + 3
+			//一些输入框过长，选择从左对齐进行输入
+			left: $(obj).offset().left + 3
 		};
 
 		var cover =
