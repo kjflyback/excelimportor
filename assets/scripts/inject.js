@@ -411,6 +411,17 @@ function downloadPattern(){
 			service.binding(val, encodeKey);
 		}
 	}
+
+	let storage_json=JSON.stringify(JSON.stringify(storage));
+
+	let Link =document.createElement("a");
+	Link.download="关联信息.json"
+	Link.style.display ='none'
+	let blob =new Blob([storage_json])
+	Link.href=URL.createObjectURL(blob)
+	document.body.appendChild(Link);
+	Link.click()
+	document.body.removeChild(Link)
 }
 
 chrome.runtime.onMessage.addListener(
