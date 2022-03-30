@@ -241,7 +241,7 @@ function setMenuData(e, data, match){
 		+ k + "'>"
 		+ data[k] + "</td></tr>"));
 	}
-	var recordBtn = $("<button id='prev'>上一条</button><button id='next'>下一条</button><button id='load'>载入存档</button>");
+	var recordBtn = $("<button id='prev'>上一条</button><button id='next'>下一条</button><button id='load'>载入存档</button><button id='download'>下载存档</button>");
 	var flowDiv = $("<div style='position:absolute;background:gainsboro;border:solid 1px darkgrey;width:300px;height:auto;'></div>")
 	.append(radioMsg)
 	.append(recordBtn)
@@ -274,6 +274,10 @@ function setMenuData(e, data, match){
 	$("#load").click(function(e){		
 		loadPattern()
 		console.log("载入之前存档")
+	});
+	$("#download").click(function(e){		
+		downloadPattern()
+		console.log("下载存档")
 	});
 	$("input[type='radio'][name='datatarget']").click(function(e){
 		if(!$(this).is(":checked")){
@@ -371,6 +375,30 @@ function loadPattern(){
 		if(!key.length) continue;
 		// "excelimportor_" + 
 		if(key.indexOf("excelimportor_") == -1) continue;
+		var encodeKey = key.substring("excelimportor_".length);
+		
+		var xpathString = window.atob(encodeKey);
+		// console.log(xpathString);
+		var objlst = xpath2objlist(xpathString);
+		
+		if(objlst.length){
+			var val = storage.getItem(key);
+			service.match[encodeKey] = val;
+			service.binding(val, encodeKey);
+		}
+	}
+}
+
+function downloadPattern(){
+	var storage = window.localStorage;
+	for(var i = 0;i<storage.length;i++){
+		var key = storage.key(i)
+		// find obj
+		// console.log(key);
+		if(!key.length) continue;
+		// "excelimportor_" + 
+		if(key.indexOf("excelimportor_") == -1) continue;
+		
 		var encodeKey = key.substring("excelimportor_".length);
 		
 		var xpathString = window.atob(encodeKey);
