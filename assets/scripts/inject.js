@@ -241,7 +241,7 @@ function setMenuData(e, data, match){
 		+ k + "'>"
 		+ data[k] + "</td></tr>"));
 	}
-	var recordBtn = $("<button id='prev'>上一条</button><button id='next'>下一条</button><button id='load'>载入存档</button><button id='download'>下载存档</button>");
+	var recordBtn = $("<button id='prev'>上一条</button><button id='next'>下一条</button><button id='load'>载入缓存</button><button id='download'>下载存档</button><input type='file' id='upload'/>");
 	var flowDiv = $("<div style='position:absolute;background:gainsboro;border:solid 1px darkgrey;width:300px;height:auto;'></div>")
 	.append(radioMsg)
 	.append(recordBtn)
@@ -278,6 +278,10 @@ function setMenuData(e, data, match){
 	$("#download").click(function(e){		
 		downloadPattern()
 		console.log("下载存档")
+	});
+	$("#upload").change(function(e){		
+		uploadPattern()
+		console.log("上传存档")
 	});
 	$("input[type='radio'][name='datatarget']").click(function(e){
 		if(!$(this).is(":checked")){
@@ -422,6 +426,28 @@ function downloadPattern(){
 	document.body.appendChild(Link);
 	Link.click()
 	document.body.removeChild(Link)
+}
+
+function uploadPattern() {
+  var selectedFile = document.getElementById("upload").files[0];//获取读取的File对象
+  var name = selectedFile.name;//读取选中文件的文件名
+  var size = selectedFile.size;//读取选中文件的大小
+  console.log("文件名:"+name+"大小："+size);
+  var reader = new FileReader();//这里是核心！！！读取操作就是由它完成的。
+  reader.readAsText(selectedFile);//读取文件的内容
+ 
+  reader.onload = function(){
+    console.log("读取结果：", this.result);//当读取完成之后会回调这个函数，然后此时文件的内容存储到了result中。直接操作即可。
+ 
+    console.log("读取结果转为JSON：");
+    let json = JSON.parse(this.result);
+
+    Object.keys(json).forEach(function (k) {
+      localStorage.setItem(k, json[k]);
+    });
+    console.log(json.name);
+    console.log(json.age);
+  };
 }
 
 chrome.runtime.onMessage.addListener(
