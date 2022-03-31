@@ -440,13 +440,12 @@ function uploadPattern() {
     console.log("读取结果：", this.result);//当读取完成之后会回调这个函数，然后此时文件的内容存储到了result中。直接操作即可。
  
     console.log("读取结果转为JSON：");
-    let json = JSON.parse(this.result);
-
+    let json = JSON.parse(JSON.parse(this.result));
+		console.log(json);
     Object.keys(json).forEach(function (k) {
       localStorage.setItem(k, json[k]);
+			//console.log(k)
     });
-    console.log(json.name);
-    console.log(json.age);
   };
 }
 
