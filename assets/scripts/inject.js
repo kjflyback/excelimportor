@@ -182,13 +182,21 @@ function fillData(){
 			// 所以优先需要 el-date-editor--date 的选择
 			// 后续再进行 el-input--suffix 的判断
 			if(obj.parentElement.className.includes("el-date-editor--date")){
+				if (val){
+
+				
+				console.log("日期"+val)
 				let valDate=new Date(val);
 				let elementUIDate=valDate.getDate()
-				let select_click_obj =xpath2objlist("//span[text()='"+elementUIDate+"']")[0]
-				//console.log(select_click_obj)
+				console.log(elementUIDate)
+				//span[text()[normalize-space()='15']]
+				let select_click_obj =xpath2objlist("//span[text()[normalize-space()='"+elementUIDate+"']")[0]
+				console.log(select_click_obj)
 				$(select_click_obj).click()
-				//window.fuck_all=select_click_obj
+				window.fuck_all=select_click_obj
+			}
 				continue;
+			
 			}else if(obj.parentElement.className.includes("el-input--suffix")){
 				let select_click_obj =xpath2objlist("//span[text()='"+val+"']")[0]
 				//console.log(select_click_obj)
