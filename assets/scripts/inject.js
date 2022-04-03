@@ -178,12 +178,22 @@ function fillData(){
 			// element UI 适配, element UI 的 select 是用 input 再套一层 额外的 ul li span 然后click绑定 事件
 			// 经过仔细核对,普通input 的 parentelement是没有 el-input--suffix这个类名的
 			// 只有elementUI的 select是有的 el-input--suffix
-			//
-			if(obj.parentElement.className.includes("el-input--suffix")){
-				let select_click_obj =xpath2objlist("//span[text()='"+val+"']")[0]
-				console.log(select_click_obj)
+			// elementUI 的时间选择控件既有 el-input-suffix 又有 el-date-editor--date
+			// 所以优先需要 el-date-editor--date 的选择
+			// 后续再进行 el-input--suffix 的判断
+			if(obj.parentElement.className.includes("el-date-editor--date")){
+				let valDate=new Date(val);
+				let elementUIDate=valDate.getDate()
+				let select_click_obj =xpath2objlist("//span[text()='"+elementUIDate+"']")[0]
+				//console.log(select_click_obj)
 				$(select_click_obj).click()
-				window.fuck_all=select_click_obj
+				//window.fuck_all=select_click_obj
+				continue;
+			}else if(obj.parentElement.className.includes("el-input--suffix")){
+				let select_click_obj =xpath2objlist("//span[text()='"+val+"']")[0]
+				//console.log(select_click_obj)
+				$(select_click_obj).click()
+				//window.fuck_all=select_click_obj
 				continue;
 			}else if(obj.type == 'radio'){
 				// 不能改变它的value，而是从同名的radio中打check
