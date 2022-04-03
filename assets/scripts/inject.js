@@ -169,12 +169,23 @@ function fillData(){
 			// console.log(index)
 			var val = data.data[index];
 			var xpathString = window.atob(k)
+			// console.log("xpath值")
+			// console.log(xpathString)
 			var obj = // $("[name='" + k + "']")[0];
 				xpath2objlist(xpathString)[0];
-			// console.log(obj)
 			if(obj == undefined) continue
 			// console.log(obj)
-			if(obj.type == 'radio'){
+			// element UI 适配, element UI 的 select 是用 input 再套一层 额外的 ul li span 然后click绑定 事件
+			// 经过仔细核对,普通input 的 parentelement是没有 el-input--suffix这个类名的
+			// 只有elementUI的 select是有的 el-input--suffix
+			//
+			if(obj.parentElement.className.includes("el-input--suffix")){
+				let select_click_obj =xpath2objlist("//span[text()='"+val+"']")[0]
+				console.log(select_click_obj)
+				$(select_click_obj).click()
+				window.fuck_all=select_click_obj
+				continue;
+			}else if(obj.type == 'radio'){
 				// 不能改变它的value，而是从同名的radio中打check
 				// 查找同name的val
 				var nameOfE = obj.name;
@@ -205,6 +216,7 @@ function fillData(){
 			$(obj).val(val);
 			obj.dispatchEvent(evt)
 			//obj.dispatchEvent(evt_click)
+			
 		}
 	})
 }
