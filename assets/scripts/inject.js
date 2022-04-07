@@ -182,20 +182,35 @@ function fillData(){
 			// 所以优先需要 el-date-editor--date 的选择
 			// 后续再进行 el-input--suffix 的判断
 			if(obj.parentElement.className.includes("el-date-editor--date")){
-				if (val){
-
-				
-				console.log("日期"+val)
-				let valDate=new Date(val);
-				let elementUIDate=valDate.getDate()
-				console.log(elementUIDate)
-				//span[text()[normalize-space()='15']]
-				let select_click_obj =xpath2objlist("//span[text()[normalize-space()='"+elementUIDate+"']")[0]
-				console.log(select_click_obj)
-				$(select_click_obj).click()
-				window.fuck_all=select_click_obj
-			}
+				let evt = document.createEvent('HTMLEvents');
+				evt.initEvent('input', true, true);
+				$(obj).val(val);
+				obj.dispatchEvent(evt)
+				// 因为时间控件已经变了 可以输入并搜索了,可以键入最终的值
+				/*
+				if (val) {
+					console.log("日期" + val)
+					let valDate = new Date(val);
+					let elementUIDate = valDate.getDate()
+					console.log(elementUIDate)
+					//只有自动化测试软件里有这个功能
+					//span[text()[normalize-space()='15']]
+					//let select_click_obj = xpath2objlist("//span[text()[normalize-space()='" + elementUIDate + "']")[0]
+					
+					//先点击控件后可以出现以下控件
+					//table[@class='el-date-table']//td[@class='available']//div//span
+					//
+					//let select_click_obj = xpath2objlist("/table[@class='el-date-table']//td[@class='available']//div//span")[0]
+					//结果还是选择不到,可能是选择器的问题
+					//console.log(select_click_obj)
+					console.log($(".el-date-table>tbody>.el-date-table__row>.available>div>span"))
+					console.log("换一种选择")
+					
+					///$(select_click_obj).click()
+					//window.fuck_all = select_click_obj
+				}
 				continue;
+				*/
 			
 			}else if(obj.parentElement.className.includes("el-input--suffix")){
 				let select_click_obj =xpath2objlist("//span[text()='"+val+"']")[0]
