@@ -21,6 +21,8 @@
 - 在打开chrome的整个运行期间,调试控制台会出现runtime error的日志，这个```不影响使用```
 - 最好把别的扩展关掉，避免可能存在的影响
 -----
+[讨论](https://github.com/kjflyback/excelimportor/discussions)
+-----
 V0.0.8
 
 V0.0.7
