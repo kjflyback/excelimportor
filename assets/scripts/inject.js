@@ -169,12 +169,56 @@ function fillData(){
 			// console.log(index)
 			var val = data.data[index];
 			var xpathString = window.atob(k)
+			// console.log("xpath值")
+			// console.log(xpathString)
 			var obj = // $("[name='" + k + "']")[0];
 				xpath2objlist(xpathString)[0];
-			// console.log(obj)
 			if(obj == undefined) continue
 			// console.log(obj)
-			if(obj.type == 'radio'){
+			// element UI 适配, element UI 的 select 是用 input 再套一层 额外的 ul li span 然后click绑定 事件
+			// 经过仔细核对,普通input 的 parentelement是没有 el-input--suffix这个类名的
+			// 只有elementUI的 select是有的 el-input--suffix
+			// elementUI 的时间选择控件既有 el-input-suffix 又有 el-date-editor--date
+			// 所以优先需要 el-date-editor--date 的选择
+			// 后续再进行 el-input--suffix 的判断
+			if(obj.parentElement.className.includes("el-date-editor--date")){
+				let evt = document.createEvent('HTMLEvents');
+				evt.initEvent('input', true, true);
+				$(obj).val(val);
+				obj.dispatchEvent(evt)
+				// 因为时间控件已经变了 可以输入并搜索了,可以键入最终的值
+				/*
+				if (val) {
+					console.log("日期" + val)
+					let valDate = new Date(val);
+					let elementUIDate = valDate.getDate()
+					console.log(elementUIDate)
+					//只有自动化测试软件里有这个功能
+					//span[text()[normalize-space()='15']]
+					//let select_click_obj = xpath2objlist("//span[text()[normalize-space()='" + elementUIDate + "']")[0]
+					
+					//先点击控件后可以出现以下控件
+					//table[@class='el-date-table']//td[@class='available']//div//span
+					//
+					//let select_click_obj = xpath2objlist("/table[@class='el-date-table']//td[@class='available']//div//span")[0]
+					//结果还是选择不到,可能是选择器的问题
+					//console.log(select_click_obj)
+					console.log($(".el-date-table>tbody>.el-date-table__row>.available>div>span"))
+					console.log("换一种选择")
+					
+					///$(select_click_obj).click()
+					//window.fuck_all = select_click_obj
+				}
+				continue;
+				*/
+			
+			}else if(obj.parentElement.className.includes("el-input--suffix")){
+				let select_click_obj =xpath2objlist("//span[text()='"+val+"']")[0]
+				//console.log(select_click_obj)
+				$(select_click_obj).click()
+				//window.fuck_all=select_click_obj
+				continue;
+			}else if(obj.type == 'radio'){
 				// 不能改变它的value，而是从同名的radio中打check
 				// 查找同name的val
 				var nameOfE = obj.name;
@@ -196,7 +240,16 @@ function fillData(){
 				}
 				continue;
 			}
+			// 为了避免直接通过js设置input的value时无法出发键盘事件导致无法提交，需要触发一次键盘事件
+			let evt = document.createEvent('HTMLEvents');
+			evt.initEvent('input', true, true);
+			//尝试加入 鼠标选择事件，暂时因为选不中所需要的控件，失败
+			let evt_click = document.createEvent('HTMLEvents');
+			evt_click.initEvent('click', true, true);
 			$(obj).val(val);
+			obj.dispatchEvent(evt)
+			//obj.dispatchEvent(evt_click)
+			
 		}
 	})
 }
@@ -233,7 +286,7 @@ function setMenuData(e, data, match){
 		+ k + "'>"
 		+ data[k] + "</td></tr>"));
 	}
-	var recordBtn = $("<button id='prev'>上一条</button><button id='next'>下一条</button>");
+	var recordBtn = $("<button id='prev'>上一条</button><button id='next'>下一条</button><button id='load'>载入缓存</button><button id='download'>下载存档</button><input type='file' id='upload'/>");
 	var flowDiv = $("<div style='position:absolute;background:gainsboro;border:solid 1px darkgrey;width:300px;height:auto;'></div>")
 	.append(radioMsg)
 	.append(recordBtn)
@@ -262,6 +315,18 @@ function setMenuData(e, data, match){
 				}
 			})
 		})
+	});
+	$("#load").click(function(e){		
+		loadPattern()
+		console.log("载入之前存档")
+	});
+	$("#download").click(function(e){		
+		downloadPattern()
+		console.log("下载存档")
+	});
+	$("#upload").change(function(e){		
+		uploadPattern()
+		console.log("上传存档")
 	});
 	$("input[type='radio'][name='datatarget']").click(function(e){
 		if(!$(this).is(":checked")){
@@ -319,7 +384,9 @@ function activeOperation() {
 		// 显示操作窗口
 		var pos = {
 			top: $(obj).offset().top + 2,
-			left: $(obj).offset().left + obj.offsetWidth + 3
+			//left: $(obj).offset().left + obj.offsetWidth + 3
+			//一些输入框过长，选择从左对齐进行输入
+			left: $(obj).offset().left + 3
 		};
 
 		var cover =
@@ -369,6 +436,62 @@ function loadPattern(){
 			service.binding(val, encodeKey);
 		}
 	}
+}
+
+function downloadPattern(){
+	var storage = window.localStorage;
+	for(var i = 0;i<storage.length;i++){
+		var key = storage.key(i)
+		// find obj
+		// console.log(key);
+		if(!key.length) continue;
+		// "excelimportor_" + 
+		if(key.indexOf("excelimportor_") == -1) continue;
+		
+		var encodeKey = key.substring("excelimportor_".length);
+		
+		var xpathString = window.atob(encodeKey);
+		// console.log(xpathString);
+		var objlst = xpath2objlist(xpathString);
+		
+		if(objlst.length){
+			var val = storage.getItem(key);
+			service.match[encodeKey] = val;
+			service.binding(val, encodeKey);
+		}
+	}
+
+	let storage_json=JSON.stringify(JSON.stringify(storage));
+
+	let Link =document.createElement("a");
+	Link.download="关联信息.json"
+	Link.style.display ='none'
+	let blob =new Blob([storage_json])
+	Link.href=URL.createObjectURL(blob)
+	document.body.appendChild(Link);
+	Link.click()
+	document.body.removeChild(Link)
+}
+
+function uploadPattern() {
+  var selectedFile = document.getElementById("upload").files[0];//获取读取的File对象
+  var name = selectedFile.name;//读取选中文件的文件名
+  var size = selectedFile.size;//读取选中文件的大小
+  console.log("文件名:"+name+"大小："+size);
+  var reader = new FileReader();//这里是核心！！！读取操作就是由它完成的。
+  reader.readAsText(selectedFile);//读取文件的内容
+ 
+  reader.onload = function(){
+    console.log("读取结果：", this.result);//当读取完成之后会回调这个函数，然后此时文件的内容存储到了result中。直接操作即可。
+ 
+    console.log("读取结果转为JSON：");
+    let json = JSON.parse(JSON.parse(this.result));
+		console.log(json);
+    Object.keys(json).forEach(function (k) {
+      localStorage.setItem(k, json[k]);
+			//console.log(k)
+    });
+  };
 }
 
 chrome.runtime.onMessage.addListener(
